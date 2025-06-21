@@ -1,977 +1,1076 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Expense Tracker</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome | User</title>
+    <link rel="shortcut icon" href="icon.png" type="image/x-icon">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
-<body class="bg-gray-50">
+  </head>
+  <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm border-b">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <h1 class="text-xl font-bold text-gray-900">Expense Tracker</h1>
-                    </div>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-3">
-                        <img id="userPhoto" class="h-8 w-8 rounded-full" src="" alt="User">
-                        <span id="userName" class="text-sm font-medium text-gray-700"></span>
-                    </div>
-                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                        Logout
-                    </button>
-                </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <h1 class="text-xl font-bold text-gray-900">Welcome!</h1>
             </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">Logout</button>
+          </div>
         </div>
+      </div>
     </nav>
 
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <div class="mb-5 bg-white overflow-hidden shadow rounded-lg">
-    <div class="p-5">
-        <div class="flex items-center">
-            <div class="flex-shrink-0">
-                <div class="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                </div>
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <img id="userPhoto" class="h-12 w-12 rounded-full mr-3" src="" alt="User" />
+              <span id="userName" class="text-sm font-medium text-gray-700"></span>
             </div>
-            <div class="ml-5 w-0 flex-1">
+          </div>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
                 <dl>
-                    <dt class="text-sm font-medium text-gray-500 truncate">Export Laporan</dt>
-                    <dd>
-                        <button onclick="exportToExcel()" class="text-sm font-medium text-purple-600 hover:text-purple-800">
-                            Download Excel
-                        </button>
-                    </dd>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Pemasukan</dt>
+                  <dd class="text-lg font-medium text-gray-900" id="totalIncome">Rp 0</dd>
                 </dl>
+              </div>
             </div>
-        </div>
-    </div>
-</div>
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pemasukan</dt>
-                                <dd class="text-lg font-medium text-gray-900" id="totalIncome">Rp 0</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Total Pengeluaran</dt>
-                                <dd class="text-lg font-medium text-gray-900" id="totalExpense">Rp 0</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white overflow-hidden shadow rounded-lg">
-                <div class="p-5">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                </svg>
-                            </div>
-                        </div>
-                        <div class="ml-5 w-0 flex-1">
-                            <dl>
-                                <dt class="text-sm font-medium text-gray-500 truncate">Saldo</dt>
-                                <dd class="text-lg font-medium" id="balance">Rp 0</dd>
-                            </dl>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Transaction Form -->
-            <div class="lg:col-span-2">
-                <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
-    <div class="px-6 py-6 sm:p-8">
-        <h3 class="text-2xl font-semibold text-gray-800 mb-6">Tambah Transaksi</h3>
-        
-        <!-- Action Buttons -->
-        <div class="flex flex-wrap gap-3 mb-6">
-            <button onclick="showTransactionForm()" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
-                + Transaksi Manual
-            </button>
-            <button onclick="showReceiptUpload()" class="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5">
-                📷 Scan Struk
-            </button>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-red-500 rounded-md flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Total Pengeluaran</dt>
+                  <dd class="text-lg font-medium text-gray-900" id="totalExpense">Rp 0</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Manual Transaction Form -->
-        <form id="transactionForm" class="space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Saldo</dt>
+                  <dd class="text-lg font-medium" id="balance">Rp 0</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Transaction Form -->
+        <div class="lg:col-span-2">
+          <div class="bg-white shadow-xl rounded-2xl overflow-hidden">
+            <div class="px-6 py-6 sm:p-8">
+              <h3 class="text-2xl font-semibold text-gray-800 mb-6">Tambah Transaksi</h3>
+
+              <!-- Action Buttons -->
+              <div class="flex flex-wrap gap-3 mb-6">
+                <button
+                  onclick="showTransactionForm()"
+                  class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+                  </svg>
+                  Transaksi Manual
+                </button>
+                <button
+                  onclick="showReceiptUpload()"
+                  class="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                  </svg>
+                  Scan Struk
+                </button>
+                <button
+                  onclick="exportToExcel()"
+                  class="flex items-center gap-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path
+                      fill-rule="evenodd"
+                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  Download Excel
+                </button>
+              </div>
+
+              <!-- Manual Transaction Form -->
+              <form id="transactionForm" class="space-y-5 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Jenis</label>
                     <select id="transactionType" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none">
-                        <option value="income">Pemasukan</option>
-                        <option value="expense">Pengeluaran</option>
+                      <option value="income">Pemasukan</option>
+                      <option value="expense">Pengeluaran</option>
                     </select>
-                </div>
-                <div>
+                  </div>
+                  <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Kategori</label>
                     <select id="transactionCategory" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none">
-                        <option value="Food">Makanan</option>
-                        <option value="Transport">Transportasi</option>
-                        <option value="Shopping">Belanja</option>
-                        <option value="Bills">Tagihan</option>
-                        <option value="Entertainment">Hiburan</option>
-                        <option value="Health">Kesehatan</option>
-                        <option value="Education">Pendidikan</option>
-                        <option value="Salary">Gaji</option>
-                        <option value="Business">Bisnis</option>
-                        <option value="Other">Lainnya</option>
+                      <option value="Food">Makanan</option>
+                      <option value="Transport">Transportasi</option>
+                      <option value="Shopping">Belanja</option>
+                      <option value="Bills">Tagihan</option>
+                      <option value="Entertainment">Hiburan</option>
+                      <option value="Health">Kesehatan</option>
+                      <option value="Education">Pendidikan</option>
+                      <option value="Salary">Gaji</option>
+                      <option value="Business">Bisnis</option>
+                      <option value="Other">Lainnya</option>
                     </select>
+                  </div>
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah (Rp)</label>
-                <input type="number" id="transactionAmount" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none" placeholder="0" required>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
-                <input type="text" id="transactionDescription" class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none" placeholder="Deskripsi transaksi" required>
-            </div>
-            <div class="flex gap-3">
-                <button type="submit" class="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah (Rp)</label>
+                  <input
+                    type="number"
+                    id="transactionAmount"
+                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                    placeholder="0"
+                    required
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                  <input
+                    type="text"
+                    id="transactionDescription"
+                    class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-100 transition-all duration-200 outline-none"
+                    placeholder="Deskripsi transaksi"
+                    required
+                  />
+                </div>
+                <div class="flex gap-3">
+                  <button
+                    type="submit"
+                    class="flex items-center gap-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
                     Simpan
-                </button>
-                <button type="button" onclick="hideTransactionForm()" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200">
+                  </button>
+                  <button
+                    type="button"
+                    onclick="hideTransactionForm()"
+                    class="flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
                     Batal
-                </button>
-            </div>
-        </form>
+                  </button>
+                </div>
+              </form>
 
-        <!-- Receipt Upload Form -->
-        <div id="receiptUpload" class="hidden cursor-pointer">
-                                                    <input id="receiptFile" type="file" accept="image/*" class="sr-only" onchange="processReceipt(this)">
-            <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors duration-200">
-                <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                </svg>
-                <div class="mt-5">
+              <!-- Receipt Upload Form -->
+              <div id="receiptUpload" class="hidden cursor-pointer">
+                <input id="receiptFile" type="file" accept="image/*" class="sr-only" onchange="processReceipt(this)" />
+                <div class="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors duration-200">
+                  <svg class="mx-auto h-16 w-16 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                    <path
+                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                  <div class="mt-5">
                     <label for="receiptFile" class="cursor-pointer">
-                        <span class="mt-2 block text-sm font-medium text-gray-900">Upload foto struk belanja</span>
+                      <span class="mt-2 block text-sm font-medium text-gray-900">Upload foto struk belanja</span>
                     </label>
                     <p class="mt-2 text-xs text-gray-500">PNG, JPG, GIF hingga 10MB</p>
+                  </div>
                 </div>
-            </div>
-            <div class="mt-5">
-                <button type="button" onclick="hideReceiptUpload()" class="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200">
+                <div class="mt-5">
+                  <button
+                    type="button"
+                    onclick="hideReceiptUpload()"
+                    class="flex items-center gap-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
                     Batal
-                </button>
-            </div>
-        </div>
-
-        <!-- Transaction List -->
-        <div class="mt-10">
-            <h4 class="text-lg font-semibold text-gray-800 mb-5">Transaksi Terbaru</h4>
-            <div id="transactionsList" class="space-y-3"></div>
-        </div>
-    </div>
-</div>
-            </div>
-
-            <!-- Statistics Chart -->
-            <div class="lg:col-span-1">
-                <div class="bg-white shadow rounded-lg">
-                    <div class="px-4 py-5 sm:p-6">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Statistik Pengeluaran</h3>
-                        <div class="relative h-64">
-                            <canvas id="expenseChart"></canvas>
-                        </div>
-                    </div>
+                  </button>
                 </div>
+              </div>
+
+              <!-- Transaction List -->
+              <div class="mt-10">
+                <h4 class="text-lg font-semibold text-gray-800 mb-5">Transaksi Terbaru</h4>
+                <div id="transactionsList" class="space-y-3 overflow-x-auto"></div>
+              </div>
             </div>
+          </div>
         </div>
+
+        <!-- Statistics Chart -->
+        <div class="lg:col-span-1">
+          <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Statistik Pengeluaran</h3>
+              <div class="relative h-64">
+                <canvas id="expenseChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Edit Transaction Modal -->
-    <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-md w-full">
-                <div class="px-6 py-4 border-b">
-                    <h3 class="text-lg font-medium text-gray-900">Edit Transaksi</h3>
-                </div>
-                <form id="editTransactionForm" class="p-6 space-y-4">
-                    <input type="hidden" id="editTransactionId">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Jenis</label>
-                        <select id="editTransactionType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="income">Pemasukan</option>
-                            <option value="expense">Pengeluaran</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Kategori</label>
-                        <select id="editTransactionCategory" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="Food">Makanan</option>
-                            <option value="Transport">Transportasi</option>
-                            <option value="Shopping">Belanja</option>
-                            <option value="Bills">Tagihan</option>
-                            <option value="Entertainment">Hiburan</option>
-                            <option value="Health">Kesehatan</option>
-                            <option value="Education">Pendidikan</option>
-                            <option value="Salary">Gaji</option>
-                            <option value="Business">Bisnis</option>
-                            <option value="Other">Lainnya</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Jumlah (Rp)</label>
-                        <input type="number" id="editTransactionAmount" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Deskripsi</label>
-                        <input type="text" id="editTransactionDescription" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                    </div>
-                    <div class="flex gap-2 pt-4">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Update
-                        </button>
-                        <button type="button" onclick="hideEditModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Batal
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+   <div id="editModal" class="fixed inset-0 bg-gray-600/50 hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+    <div class="px-8 py-2 border-b border-gray-100 bg-gray-50">
+      <h3 class="text-xl font-semibold text-gray-800">Edit Transaksi</h3>
     </div>
+    
+    <form id="editTransactionForm" class="p-2 space-y-6">
+      <input type="hidden" id="editTransactionId" />
+      
+      <div class="space-y-6">
+        <div>
+          <label class="block text-base font-medium text-gray-700 mb-2">Jenis Transaksi</label>
+          <select id="editTransactionType" class="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            <option value="income">Pemasukan</option>
+            <option value="expense">Pengeluaran</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-base font-medium text-gray-700 mb-2">Kategori</label>
+          <select id="editTransactionCategory" class="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            <option value="Food">Makanan</option>
+            <option value="Transport">Transportasi</option>
+            <option value="Shopping">Belanja</option>
+            <option value="Bills">Tagihan</option>
+            <option value="Entertainment">Hiburan</option>
+            <option value="Health">Kesehatan</option>
+            <option value="Education">Pendidikan</option>
+            <option value="Salary">Gaji</option>
+            <option value="Business">Bisnis</option>
+            <option value="Other">Lainnya</option>
+          </select>
+        </div>
+        
+        <div>
+          <label class="block text-base font-medium text-gray-700 mb-2">Jumlah (Rp)</label>
+          <div class="relative">
+            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">Rp</span>
+            <input type="number" id="editTransactionAmount" 
+                   class="w-full pl-12 pr-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                   required />
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-base font-medium text-gray-700 mb-2">Deskripsi</label>
+          <input type="text" id="editTransactionDescription" 
+                 class="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
+                 required />
+        </div>
+      </div>
+      
+      <div class="flex gap-4 pt-4">
+        <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg text-base font-medium transition-colors shadow-sm">
+          Update
+        </button>
+        <button type="button" onclick="hideEditModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 px-6 py-3 rounded-lg text-base font-medium transition-colors">
+          Batal
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
     <!-- Receipt Processing Modal -->
     <div id="receiptModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto">
-                <div class="px-6 py-4 border-b">
-                    <h3 class="text-lg font-medium text-gray-900">Hasil Scan Struk</h3>
-                </div>
-                <div class="p-6">
-                    <div id="receiptItems" class="space-y-2 mb-4">
-                        <!-- Receipt items will be loaded here -->
-                    </div>
-                    <div class="border-t pt-4">
-                        <div class="flex justify-between items-center font-medium">
-                            <span>Total:</span>
-                            <span id="receiptTotal">Rp 0</span>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 pt-4">
-                        <button onclick="saveReceiptItems()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Simpan Semua
-                        </button>
-                        <button onclick="hideReceiptModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
-                            Batal
-                        </button>
-                    </div>
-                </div>
+      <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto">
+          <div class="px-6 py-4 border-b">
+            <h3 class="text-lg font-medium text-gray-900">Hasil Scan Struk</h3>
+          </div>
+          <div class="p-6">
+            <div id="receiptItems" class="space-y-2 mb-4">
+              <!-- Receipt items will be loaded here -->
             </div>
+            <div class="border-t pt-4">
+              <div class="flex justify-between items-center font-medium">
+                <span>Total:</span>
+                <span id="receiptTotal">Rp 0</span>
+              </div>
+            </div>
+            <div class="flex gap-2 pt-4">
+              <button onclick="saveReceiptItems()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium">Simpan Semua</button>
+              <button onclick="hideReceiptModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">Batal</button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        let currentUser = null;
-let transactions = [];
-let expenseChart = null;
-let receiptItems = [];
+      let currentUser = null;
+      let transactions = [];
+      let expenseChart = null;
+      let receiptItems = [];
 
-// Initialize page
-document.addEventListener('DOMContentLoaded', async () => {
-    await loadUserProfile();
-    await loadTransactions();
-    await loadStats();
-    initializeChart();
-});
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", async () => {
+        await loadUserProfile();
+        await loadTransactions();
+        await loadStats();
+        initializeChart();
+      });
 
-// Load user profile
-async function loadUserProfile() {
-    try {
-        const response = await fetch('/api/profile');
-        if (response.ok) {
+      // Load user profile
+      async function loadUserProfile() {
+        try {
+          const response = await fetch("/api/profile");
+          if (response.ok) {
             currentUser = await response.json();
-            document.getElementById('userName').textContent = currentUser.name;
-            document.getElementById('userPhoto').src = currentUser.photoURL || '/default-avatar.png';
-        } else {
-            window.location.href = '/';
+            document.getElementById("userName").textContent = currentUser.name;
+            document.getElementById("userPhoto").src = currentUser.photoURL || "/default-avatar.png";
+          } else {
+            window.location.href = "/";
+          }
+        } catch (error) {
+          console.error("Error loading profile:", error);
+          window.location.href = "/";
         }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        window.location.href = '/';
-    }
-}
+      }
 
-// Load transactions
-async function loadTransactions() {
-    try {
-        const response = await fetch('/api/transactions');
-        if (response.ok) {
+      // Load transactions
+      async function loadTransactions() {
+        try {
+          const response = await fetch("/api/transactions");
+          if (response.ok) {
             transactions = await response.json();
             displayTransactions();
+          }
+        } catch (error) {
+          console.error("Error loading transactions:", error);
         }
-    } catch (error) {
-        console.error('Error loading transactions:', error);
-    }
-}
+      }
 
-// Display transactions
-function displayTransactions() {
-    const container = document.getElementById('transactionsList');
-    container.innerHTML = '';
+      // Display transactions
+      function displayTransactions() {
+        const container = document.getElementById("transactionsList");
+        container.innerHTML = "";
 
-    const recentTransactions = transactions.slice(-10).reverse();
+        const recentTransactions = transactions.slice(-10).reverse();
 
-    recentTransactions.forEach(transaction => {
-        const div = document.createElement('div');
-        div.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
-        div.innerHTML = `
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-full flex items-center justify-center ${transaction.type === 'income' ? 'bg-green-100' : 'bg-red-100'}">
-                    <span class="text-sm ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
-                        ${transaction.type === 'income' ? '+' : '-'}
-                    </span>
+        recentTransactions.forEach((transaction) => {
+          const div = document.createElement("div");
+          div.className = "flex items-center justify-between p-4 bg-white rounded-xl shadow-xs hover:shadow-sm transition-all duration-200 mb-3 border border-gray-100";
+div.innerHTML = `
+    <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center ${transaction.type === "income" ? "bg-green-50" : "bg-red-50"} shadow-inner">
+            <span class="text-sm ${transaction.type === "income" ? "text-green-600" : "text-red-600"} font-medium">
+                ${transaction.type === "income" ? "+" : "-"}
+            </span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <div class="text-sm font-semibold text-gray-800 truncate">${transaction.description}</div>
+            <div class="flex items-center space-x-2 text-sm text-gray-500">
+                <span class="bg-yellow-100 px-2 py-0.5 rounded-full">${transaction.category}</span>
+                <span>•</span>
+                <span>${new Date(transaction.createdAt).toLocaleDateString("id-ID")}</span>
                 </div>
-                <div>
-                    <div class="text-sm font-medium text-gray-900">${transaction.description}</div>
-                    <div class="text-xs text-gray-500">${transaction.category} • ${new Date(transaction.createdAt).toLocaleDateString('id-ID')}</div>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-sm font-medium ${transaction.type === 'income' ? 'text-green-600' : 'text-red-600'}">
-                    ${transaction.type === 'income' ? '+' : '-'}Rp ${transaction.amount.toLocaleString('id-ID')}
-                </span>
-                <div class="flex space-x-1">
-                    <button onclick="editTransaction('${transaction.id}')" class="text-blue-600 hover:text-blue-800">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                    </button>
-                    <button onclick="deleteTransaction('${transaction.id}')" class="text-red-600 hover:text-red-800">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-}
+                <span class="text-sm font-semibold ${transaction.type === "income" ? "text-green-600" : "text-red-600"}">
+            ${transaction.type === "income" ? "+" : "-"}Rp ${transaction.amount.toLocaleString("id-ID")}
+        </span>
+        </div>
+    </div>
+    <div class="flex items-center space-x-3">
+        <div class="flex space-x-2">
+            <button onclick="editTransaction('${transaction.id}')" class="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-full transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                </svg>
+            </button>
+            <button onclick="deleteTransaction('${transaction.id}')" class="p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors duration-200">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+`;
+container.appendChild(div);
+        });
+      }
 
-// Load statistics
-// Di bagian loadStats()
-async function loadStats() {
-    try {
-        const response = await fetch('/api/stats');
-        if (response.ok) {
+      // Load statistics
+      // Di bagian loadStats()
+      async function loadStats() {
+        try {
+          const response = await fetch("/api/stats");
+          if (response.ok) {
             const stats = await response.json();
-            document.getElementById('totalIncome').textContent = `Rp ${stats.totalIncome.toLocaleString('id-ID')}`;
-            document.getElementById('totalExpense').textContent = `Rp ${stats.totalExpense.toLocaleString('id-ID')}`;
-            
-            const balanceElement = document.getElementById('balance');
-            balanceElement.textContent = `Rp ${stats.balance.toLocaleString('id-ID')}`;
-            balanceElement.className = `text-lg font-medium ${stats.balance >= 0 ? 'text-green-600' : 'text-red-600'}`;
-            
-            // Pastikan chart sudah diinisialisasi sebelum diupdate
-            if (!expenseChart) {
-                initializeChart();
-            }
-            updateChart(stats.categoryExpenses);
-        }
-    } catch (error) {
-        console.error('Error loading stats:', error);
-        // Jika error, inisialisasi chart kosong
-        if (!expenseChart) {
-            initializeChart();
-        }
-    }
-}
+            document.getElementById("totalIncome").textContent = `Rp ${stats.totalIncome.toLocaleString("id-ID")}`;
+            document.getElementById("totalExpense").textContent = `Rp ${stats.totalExpense.toLocaleString("id-ID")}`;
 
-// Di bagian initializeChart()
-function initializeChart() {
-    const ctx = document.getElementById('expenseChart');
-    if (!ctx) return;
-    
-    // Hancurkan chart sebelumnya jika ada
-    if (expenseChart) {
-        expenseChart.destroy();
-    }
-    
-    expenseChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['No Data'],
-            datasets: [{
+            // Update balance display
+            const balanceElement = document.getElementById("balance");
+            if (balanceElement) {
+              balanceElement.textContent = `Rp ${stats.balance.toLocaleString("id-ID")}`;
+              balanceElement.className = `text-lg font-medium ${stats.balance >= 0 ? "text-green-600" : "text-red-600"}`;
+            }
+
+            if (!expenseChart) {
+              initializeChart();
+            }
+
+            // Prepare chart data - always include balance, even if no expenses
+            const chartData = {
+              ...stats.categoryExpenses,
+              Saldo: Math.max(stats.balance, 0), // Only show positive balance
+            };
+
+            updateChart(chartData, stats.balance);
+          }
+        } catch (error) {
+          console.error("Error loading stats:", error);
+          if (!expenseChart) {
+            initializeChart();
+          }
+        }
+      }
+
+      // Update chart with data
+      function updateChart(chartData, balance) {
+        if (!expenseChart) return;
+
+        // If no expense data but we have balance, show balance
+        if ((!chartData || Object.keys(chartData).length === 0) && balance !== undefined) {
+          expenseChart.data.labels = ["Saldo"];
+          expenseChart.data.datasets[0].data = [Math.max(balance, 0)];
+          expenseChart.data.datasets[0].backgroundColor = ["#4CAF50"]; // Green for balance
+        }
+        // If no data at all (shouldn't happen with the API)
+        else if (!chartData || Object.keys(chartData).length === 0) {
+          expenseChart.data.labels = ["No Data"];
+          expenseChart.data.datasets[0].data = [1];
+          expenseChart.data.datasets[0].backgroundColor = ["#C9CBCF"];
+        }
+        // Normal case with both expenses and balance
+        else {
+          const labels = Object.keys(chartData);
+          const data = Object.values(chartData);
+
+          // Generate colors - make sure balance is always green
+          const colors = labels.map((label) =>
+            label === "Saldo"
+              ? "#4CAF50" // Green for balance
+              : ["#22c55e", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#8AC24A", "#C9CBCF", "#607D8B", "#9C27B0"][labels.indexOf(label) % 10]
+          );
+
+          expenseChart.data.labels = labels;
+          expenseChart.data.datasets[0].data = data;
+          expenseChart.data.datasets[0].backgroundColor = colors;
+        }
+
+        expenseChart.update();
+      }
+      function initializeChart() {
+        const ctx = document.getElementById("expenseChart");
+        if (!ctx) return;
+
+        // Hancurkan chart sebelumnya jika ada
+        if (expenseChart) {
+          expenseChart.destroy();
+        }
+
+        expenseChart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: ["No Data"],
+            datasets: [
+              {
                 data: [1],
-                backgroundColor: ['#C9CBCF']
-            }]
-        },
-        options: {
+                backgroundColor: ["#C9CBCF"],
+              },
+            ],
+          },
+          options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: {
-                    position: 'bottom'
-                }
-            }
-        }
-    });
-}
+              legend: {
+                position: "bottom",
+              },
+            },
+          },
+        });
+      }
 
-// Di bagian updateChart()
-function updateChart(categoryExpenses) {
-    if (!expenseChart) return;
-    
-    // Jika tidak ada data, tampilkan pesan "No Data"
-    if (!categoryExpenses || Object.keys(categoryExpenses).length === 0) {
-        expenseChart.data.labels = ['No Data'];
-        expenseChart.data.datasets[0].data = [1];
-        expenseChart.data.datasets[0].backgroundColor = ['#C9CBCF'];
-    } else {
+      function initializeChart() {
+        const ctx = document.getElementById("expenseChart").getContext("2d");
+        expenseChart = new Chart(ctx, {
+          type: "pie",
+          data: {
+            labels: [],
+            datasets: [
+              {
+                data: [],
+                backgroundColor: ["#22c55e", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF", "#FF9F40", "#22c55e", "#C9CBCF", "#4BC0C0", "#22c55e"],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: {
+                  boxWidth: 12,
+                  padding: 10,
+                  font: {
+                    size: 11,
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
+
+      // Update chart
+      function updateChart(categoryExpenses) {
         const labels = Object.keys(categoryExpenses);
         const data = Object.values(categoryExpenses);
-        
+
         expenseChart.data.labels = labels;
         expenseChart.data.datasets[0].data = data;
-        expenseChart.data.datasets[0].backgroundColor = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-            '#FF9F40', '#8AC24A', '#C9CBCF', '#607D8B', '#9C27B0'
-        ];
-    }
-    
-    expenseChart.update();
-}
-// Initialize chart
-function initializeChart() {
-    const ctx = document.getElementById('expenseChart').getContext('2d');
-    expenseChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: [
-                    '#FF6384',
-                    '#36A2EB',
-                    '#FFCE56',
-                    '#4BC0C0',
-                    '#9966FF',
-                    '#FF9F40',
-                    '#FF6384',
-                    '#C9CBCF',
-                    '#4BC0C0',
-                    '#FF6384'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        boxWidth: 12,
-                        padding: 10,
-                        font: {
-                            size: 11
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
+        expenseChart.update();
+      }
 
-// Update chart
-function updateChart(categoryExpenses) {
-    const labels = Object.keys(categoryExpenses);
-    const data = Object.values(categoryExpenses);
-    
-    expenseChart.data.labels = labels;
-    expenseChart.data.datasets[0].data = data;
-    expenseChart.update();
-}
+      // Show transaction form
+      function showTransactionForm() {
+        document.getElementById("transactionForm").classList.remove("hidden");
+        document.getElementById("receiptUpload").classList.add("hidden");
+      }
 
-// Show transaction form
-function showTransactionForm() {
-    document.getElementById('transactionForm').classList.remove('hidden');
-    document.getElementById('receiptUpload').classList.add('hidden');
-}
+      // Hide transaction form
+      function hideTransactionForm() {
+        document.getElementById("transactionForm").classList.add("hidden");
+        document.getElementById("transactionForm").reset();
+      }
 
-// Hide transaction form
-function hideTransactionForm() {
-    document.getElementById('transactionForm').classList.add('hidden');
-    document.getElementById('transactionForm').reset();
-}
+      // Show receipt upload
+      function showReceiptUpload() {
+        document.getElementById("receiptUpload").classList.remove("hidden");
+        document.getElementById("transactionForm").classList.add("hidden");
+      }
 
-// Show receipt upload
-function showReceiptUpload() {
-    document.getElementById('receiptUpload').classList.remove('hidden');
-    document.getElementById('transactionForm').classList.add('hidden');
-}
+      // Hide receipt upload
+      function hideReceiptUpload() {
+        document.getElementById("receiptUpload").classList.add("hidden");
+        document.getElementById("receiptFile").value = "";
+      }
 
-// Hide receipt upload
-function hideReceiptUpload() {
-    document.getElementById('receiptUpload').classList.add('hidden');
-    document.getElementById('receiptFile').value = '';
-}
+      // Process receipt
+      async function processReceipt(input) {
+        if (!input.files || !input.files[0]) return;
 
-// Process receipt
-async function processReceipt(input) {
-    if (!input.files || !input.files[0]) return;
-    
-    const file = input.files[0];
-    const reader = new FileReader();
-    
-    reader.onload = async function(e) {
-        try {
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async function (e) {
+          try {
             Swal.fire({
-                title: 'Memproses struk...',
-                html: 'Sedang menganalisis gambar dengan AI',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+              title: "Memproses struk...",
+              html: "Sedang menganalisis gambar dengan AI",
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
             });
 
-            const response = await fetch('/api/process-receipt', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    imageBase64: e.target.result
-                })
+            const response = await fetch("/api/process-receipt", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                imageBase64: e.target.result,
+              }),
             });
 
             const result = await response.json();
-            
-            if (response.ok) {
-                receiptItems = result.items || [];
-                showReceiptModal(result);
-                hideReceiptUpload();
-                Swal.close();
-            } else {
-                throw new Error(result.error);
-            }
-        } catch (error) {
-            console.error('Error processing receipt:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal memproses struk',
-                text: 'Terjadi kesalahan saat memproses gambar. Silakan coba lagi.'
-            });
-        }
-    };
-    
-    reader.readAsDataURL(file);
-}
 
-// Show receipt modal
-function showReceiptModal(result) {
-    const modal = document.getElementById('receiptModal');
-    const itemsContainer = document.getElementById('receiptItems');
-    const totalElement = document.getElementById('receiptTotal');
-    
-    itemsContainer.innerHTML = '';
-    
-    result.items.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'flex items-center justify-between p-2 bg-gray-50 rounded';
+            if (response.ok) {
+              receiptItems = result.items || [];
+              showReceiptModal(result);
+              hideReceiptUpload();
+              Swal.close();
+            } else {
+              throw new Error(result.error);
+            }
+          } catch (error) {
+            console.error("Error processing receipt:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Gagal memproses struk",
+              text: "Terjadi kesalahan saat memproses gambar. Silakan coba lagi.",
+            });
+          }
+        };
+
+        reader.readAsDataURL(file);
+      }
+
+      // Show receipt modal
+      function showReceiptModal(result) {
+        const modal = document.getElementById("receiptModal");
+        const itemsContainer = document.getElementById("receiptItems");
+        const totalElement = document.getElementById("receiptTotal");
+
+        itemsContainer.innerHTML = "";
+
+        result.items.forEach((item, index) => {
+             const div = document.createElement("div");
+        div.className = "flex items-center justify-between p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 mb-2";
         div.innerHTML = `
-            <div class="flex-1">
-                <input type="text" value="${item.name}" class="w-full border-none bg-transparent text-sm font-medium" 
-                       onchange="updateReceiptItem(${index}, 'name', this.value)">
+            <div class="flex-1 mr-4">
+                <input type="text" value="${item.name}" 
+                    class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base font-medium transition-all duration-200"
+                    onchange="updateReceiptItem(${index}, 'name', this.value)">
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-500">Rp</span>
-                <input type="number" value="${item.price}" class="w-20 border-none bg-transparent text-sm text-right" 
-                       onchange="updateReceiptItem(${index}, 'price', this.value)">
-                <button onclick="removeReceiptItem(${index})" class="text-red-600 hover:text-red-800">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">Rp</span>
+                    <input type="number" value="${item.price}" 
+                        class="pl-10 pr-4 py-2 w-32 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base text-right transition-all duration-200"
+                        onchange="updateReceiptItem(${index}, 'price', this.value)">
+                </div>
+                <button onclick="removeReceiptItem(${index})" class="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full transition-colors duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
         `;
-        itemsContainer.appendChild(div);
-    });
-    
-    totalElement.textContent = `Rp ${(result.total || 0).toLocaleString('id-ID')}`;
-    modal.classList.remove('hidden');
-}
+          itemsContainer.appendChild(div);
+        });
 
-// Update receipt item
-function updateReceiptItem(index, field, value) {
-    if (receiptItems[index]) {
-        receiptItems[index][field] = field === 'price' ? parseFloat(value) || 0 : value;
-        updateReceiptTotal();
-    }
-}
+        totalElement.textContent = `Rp ${(result.total || 0).toLocaleString("id-ID")}`;
+        modal.classList.remove("hidden");
+      }
 
-// Remove receipt item
-function removeReceiptItem(index) {
-    receiptItems.splice(index, 1);
-    const result = { items: receiptItems, total: receiptItems.reduce((sum, item) => sum + item.price, 0) };
-    showReceiptModal(result);
-}
+      // Update receipt item
+      function updateReceiptItem(index, field, value) {
+        if (receiptItems[index]) {
+          receiptItems[index][field] = field === "price" ? parseFloat(value) || 0 : value;
+          updateReceiptTotal();
+        }
+      }
 
-// Update receipt total
-function updateReceiptTotal() {
-    const total = receiptItems.reduce((sum, item) => sum + item.price, 0);
-    document.getElementById('receiptTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
-}
+      // Remove receipt item
+      function removeReceiptItem(index) {
+        receiptItems.splice(index, 1);
+        const result = { items: receiptItems, total: receiptItems.reduce((sum, item) => sum + item.price, 0) };
+        showReceiptModal(result);
+      }
 
-// Save receipt items
-async function saveReceiptItems() {
-    try {
-        const promises = receiptItems.map(item => 
-            fetch('/api/transactions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    type: 'expense',
-                    amount: item.price,
-                    description: item.name,
-                    category: 'Shopping'
-                })
+      // Update receipt total
+      function updateReceiptTotal() {
+        const total = receiptItems.reduce((sum, item) => sum + item.price, 0);
+        document.getElementById("receiptTotal").textContent = `Rp ${total.toLocaleString("id-ID")}`;
+      }
+
+      // Save receipt items
+      async function saveReceiptItems() {
+        try {
+          const promises = receiptItems.map((item) =>
+            fetch("/api/transactions", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                type: "expense",
+                amount: item.price,
+                description: item.name,
+                category: "Shopping",
+              }),
             })
-        );
+          );
 
-        await Promise.all(promises);
-        
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil!',
+          await Promise.all(promises);
+
+          Swal.fire({
+            icon: "success",
+            title: "Berhasil!",
             text: `${receiptItems.length} transaksi berhasil disimpan`,
             timer: 1500,
-            showConfirmButton: false
-        });
+            showConfirmButton: false,
+          });
 
-        hideReceiptModal();
-        await loadTransactions();
-        await loadStats();
-    } catch (error) {
-        console.error('Error saving receipt items:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal menyimpan',
-            text: 'Terjadi kesalahan saat menyimpan transaksi'
-        });
-    }
-}
+          hideReceiptModal();
+          await loadTransactions();
+          await loadStats();
+        } catch (error) {
+          console.error("Error saving receipt items:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal menyimpan",
+            text: "Terjadi kesalahan saat menyimpan transaksi",
+          });
+        }
+      }
 
-// Hide receipt modal
-function hideReceiptModal() {
-    document.getElementById('receiptModal').classList.add('hidden');
-    receiptItems = [];
-}
+      // Hide receipt modal
+      function hideReceiptModal() {
+        document.getElementById("receiptModal").classList.add("hidden");
+        receiptItems = [];
+      }
 
-// Transaction form submit
-document.getElementById('transactionForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const formData = {
-        type: document.getElementById('transactionType').value,
-        amount: document.getElementById('transactionAmount').value,
-        description: document.getElementById('transactionDescription').value,
-        category: document.getElementById('transactionCategory').value
-    };
+      // Transaction form submit
+      document.getElementById("transactionForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-    try {
-        const response = await fetch('/api/transactions', {
-            method: 'POST',
+        const formData = {
+          type: document.getElementById("transactionType").value,
+          amount: document.getElementById("transactionAmount").value,
+          description: document.getElementById("transactionDescription").value,
+          category: document.getElementById("transactionCategory").value,
+        };
+
+        try {
+          const response = await fetch("/api/transactions", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify(formData)
-        });
+            body: JSON.stringify(formData),
+          });
 
-        if (response.ok) {
+          if (response.ok) {
             Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Transaksi berhasil ditambahkan',
-                timer: 1500,
-                showConfirmButton: false
+              icon: "success",
+              title: "Berhasil!",
+              text: "Transaksi berhasil ditambahkan",
+              timer: 1500,
+              showConfirmButton: false,
             });
-            
+
             hideTransactionForm();
             await loadTransactions();
             await loadStats();
-        } else {
-            throw new Error('Failed to add transaction');
+          } else {
+            throw new Error("Failed to add transaction");
+          }
+        } catch (error) {
+          console.error("Error adding transaction:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal menambahkan transaksi",
+            text: "Terjadi kesalahan saat menyimpan data",
+          });
         }
-    } catch (error) {
-        console.error('Error adding transaction:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal menambahkan transaksi',
-            text: 'Terjadi kesalahan saat menyimpan data'
-        });
-    }
-});
+      });
 
-// Edit transaction
-function editTransaction(id) {
-    const transaction = transactions.find(t => t.id === id);
-    if (!transaction) return;
+      // Edit transaction
+      function editTransaction(id) {
+        const transaction = transactions.find((t) => t.id === id);
+        if (!transaction) return;
 
-    document.getElementById('editTransactionId').value = id;
-    document.getElementById('editTransactionType').value = transaction.type;
-    document.getElementById('editTransactionCategory').value = transaction.category;
-    document.getElementById('editTransactionAmount').value = transaction.amount;
-    document.getElementById('editTransactionDescription').value = transaction.description;
-    
-    document.getElementById('editModal').classList.remove('hidden');
-}
+        document.getElementById("editTransactionId").value = id;
+        document.getElementById("editTransactionType").value = transaction.type;
+        document.getElementById("editTransactionCategory").value = transaction.category;
+        document.getElementById("editTransactionAmount").value = transaction.amount;
+        document.getElementById("editTransactionDescription").value = transaction.description;
 
-// Hide edit modal
-function hideEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-}
+        document.getElementById("editModal").classList.remove("hidden");
+      }
 
-// Edit transaction form submit
-document.getElementById('editTransactionForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const id = document.getElementById('editTransactionId').value;
-    const formData = {
-        type: document.getElementById('editTransactionType').value,
-        amount: document.getElementById('editTransactionAmount').value,
-        description: document.getElementById('editTransactionDescription').value,
-        category: document.getElementById('editTransactionCategory').value
-    };
+      // Hide edit modal
+      function hideEditModal() {
+        document.getElementById("editModal").classList.add("hidden");
+      }
 
-    try {
-        const response = await fetch(`/api/transactions/${id}`, {
-            method: 'PUT',
+      // Edit transaction form submit
+      document.getElementById("editTransactionForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById("editTransactionId").value;
+        const formData = {
+          type: document.getElementById("editTransactionType").value,
+          amount: document.getElementById("editTransactionAmount").value,
+          description: document.getElementById("editTransactionDescription").value,
+          category: document.getElementById("editTransactionCategory").value,
+        };
+
+        try {
+          const response = await fetch(`/api/transactions/${id}`, {
+            method: "PUT",
             headers: {
-                'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify(formData)
-        });
+            body: JSON.stringify(formData),
+          });
 
-        if (response.ok) {
+          if (response.ok) {
             Swal.fire({
-                icon: 'success',
-                title: 'Berhasil!',
-                text: 'Transaksi berhasil diupdate',
-                timer: 1500,
-                showConfirmButton: false
+              icon: "success",
+              title: "Berhasil!",
+              text: "Transaksi berhasil diupdate",
+              timer: 1500,
+              showConfirmButton: false,
             });
-            
+
             hideEditModal();
             await loadTransactions();
             await loadStats();
-        } else {
-            throw new Error('Failed to update transaction');
-        }
-    } catch (error) {
-        console.error('Error updating transaction:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal mengupdate transaksi',
-            text: 'Terjadi kesalahan saat menyimpan data'
-        });
-    }
-});
-
-// Delete transaction
-async function deleteTransaction(id) {
-    const result = await Swal.fire({
-        title: 'Hapus transaksi?',
-        text: 'Transaksi yang dihapus tidak dapat dikembalikan',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Hapus',
-        cancelButtonText: 'Batal'
-    });
-
-    if (result.isConfirmed) {
-        try {
-            const response = await fetch(`/api/transactions/${id}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil!',
-                    text: 'Transaksi berhasil dihapus',
-                    timer: 1500,
-                    showConfirmButton: false
-                });
-                
-                await loadTransactions();
-                await loadStats();
-            } else {
-                throw new Error('Failed to delete transaction');
-            }
+          } else {
+            throw new Error("Failed to update transaction");
+          }
         } catch (error) {
-            console.error('Error deleting transaction:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Gagal menghapus transaksi',
-                text: 'Terjadi kesalahan saat menghapus data'
-            });
+          console.error("Error updating transaction:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal mengupdate transaksi",
+            text: "Terjadi kesalahan saat menyimpan data",
+          });
         }
-    }
-}
-// Fungsi untuk export ke Excel
-async function exportToExcel() {
-    try {
-        Swal.fire({
-            title: 'Menyiapkan laporan...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
+      });
 
-        // Ambil data transaksi
-        const response = await fetch('/api/transactions');
-        if (!response.ok) throw new Error('Gagal mengambil data transaksi');
-        const transactions = await response.json();
-
-        // Format data untuk Excel
-        const excelData = transactions.map(transaction => ({
-            Tanggal: new Date(transaction.createdAt).toLocaleDateString('id-ID'),
-            Jenis: transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-            Kategori: transaction.category,
-            Deskripsi: transaction.description,
-            Jumlah: transaction.amount,
-            'Tanda': transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran'
-        }));
-
-        // Buat worksheet
-        const worksheet = XLSX.utils.json_to_sheet(excelData);
-        
-        // Buat workbook
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
-        
-        // Generate file Excel
-        const date = new Date().toISOString().split('T')[0];
-        XLSX.writeFile(workbook, `Laporan_Keuangan_${date}.xlsx`);
-        
-        Swal.close();
-    } catch (error) {
-        console.error('Export error:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal export',
-            text: 'Terjadi kesalahan saat membuat laporan Excel'
-        });
-    }
-}
-
-// Logout - FIXED: Tidak menghapus data transaksi, hanya membersihkan sesi
-// Logout - FIXED: Tidak menghapus data transaksi, hanya membersihkan sesi
-async function logout() {
-    try {
+      // Delete transaction
+      async function deleteTransaction(id) {
         const result = await Swal.fire({
-            title: 'Logout?',
-            text: 'Data transaksi Anda akan tetap tersimpan dan dapat diakses saat login kembali',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Logout',
-            cancelButtonText: 'Batal'
+          title: "Hapus transaksi?",
+          text: "Transaksi yang dihapus tidak dapat dikembalikan",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#3085d6",
+          confirmButtonText: "Hapus",
+          cancelButtonText: "Batal",
         });
 
         if (result.isConfirmed) {
-            Swal.fire({
-                title: 'Logging out...',
-                html: 'Sedang mengeluarkan Anda dari sistem',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const response = await fetch('/api/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
+          try {
+            const response = await fetch(`/api/transactions/${id}`, {
+              method: "DELETE",
             });
 
             if (response.ok) {
-                // Jangan reset transactions jika ingin tetap muncul setelah login ulang
-                currentUser = null;
-                receiptItems = [];
+              Swal.fire({
+                icon: "success",
+                title: "Berhasil!",
+                text: "Transaksi berhasil dihapus",
+                timer: 1500,
+                showConfirmButton: false,
+              });
 
-                if (expenseChart) {
-                    expenseChart.destroy();
-                    expenseChart = null;
-                }
-
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Berhasil Logout',
-                    text: 'Anda berhasil keluar dari sistem',
-                    timer: 1500,
-                    showConfirmButton: false
-                }).then(() => {
-                    window.location.href = '/';
-                });
+              await loadTransactions();
+              await loadStats();
             } else {
-                throw new Error('Logout failed');
+              throw new Error("Failed to delete transaction");
             }
+          } catch (error) {
+            console.error("Error deleting transaction:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Gagal menghapus transaksi",
+              text: "Terjadi kesalahan saat menghapus data",
+            });
+          }
         }
-    } catch (error) {
-        console.error('Error during logout:', error);
-        Swal.fire({
-            icon: 'error',
-            title: 'Gagal Logout',
-            text: 'Terjadi kesalahan saat logout. Silakan coba lagi.'
-        });
-    }
-}
+      }
+      // Fungsi untuk export ke Excel
+      async function exportToExcel() {
+        try {
+          Swal.fire({
+            title: "Menyiapkan laporan...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
 
+          // Get transactions and stats
+          const [transactionsRes, statsRes] = await Promise.all([fetch("/api/transactions"), fetch("/api/stats")]);
+
+          if (!transactionsRes.ok || !statsRes.ok) throw new Error("Gagal mengambil data");
+
+          const transactions = await transactionsRes.json();
+          const stats = await statsRes.json();
+
+          // Format data for Excel
+          const excelData = transactions.map((transaction) => ({
+            Tanggal: new Date(transaction.createdAt).toLocaleDateString("id-ID"),
+            Jenis: transaction.type === "income" ? "Pemasukan" : "Pengeluaran",
+            Kategori: transaction.category,
+            Deskripsi: transaction.description,
+            Jumlah: transaction.amount,
+            Tanda: transaction.type === "income" ? "Pemasukan" : "Pengeluaran",
+          }));
+
+          // Add summary rows
+          excelData.push(
+            {},
+            {
+              Deskripsi: "TOTAL PEMASUKAN",
+              Jumlah: stats.totalIncome,
+            },
+            {
+              Deskripsi: "TOTAL PENGELUARAN",
+              Jumlah: stats.totalExpense,
+            },
+            {
+              Deskripsi: "SALDO AKHIR",
+              Jumlah: stats.balance,
+            }
+          );
+
+          // Create worksheet
+          const worksheet = XLSX.utils.json_to_sheet(excelData, { skipHeader: true });
+
+          // Add headers manually to avoid them being mixed with data
+          XLSX.utils.sheet_add_aoa(worksheet, [["Tanggal", "Jenis", "Kategori", "Deskripsi", "Jumlah", "Tanda"]], { origin: "A1" });
+
+          // Create workbook
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
+
+          // Generate Excel file
+          const date = new Date().toISOString().split("T")[0];
+          XLSX.writeFile(workbook, `Laporan_Keuangan_${date}.xlsx`);
+
+          Swal.close();
+        } catch (error) {
+          console.error("Export error:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal export",
+            text: "Terjadi kesalahan saat membuat laporan Excel",
+          });
+        }
+      }
+      // Logout - FIXED: Tidak menghapus data transaksi, hanya membersihkan sesi
+      // Logout - FIXED: Tidak menghapus data transaksi, hanya membersihkan sesi
+      async function logout() {
+        try {
+          const result = await Swal.fire({
+            title: "Logout?",
+            text: "Data transaksi Anda akan tetap tersimpan dan dapat diakses saat login kembali",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Logout",
+            cancelButtonText: "Batal",
+          });
+
+          if (result.isConfirmed) {
+            Swal.fire({
+              title: "Logging out...",
+              html: "Sedang mengeluarkan Anda dari sistem",
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              },
+            });
+
+            const response = await fetch("/api/logout", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (response.ok) {
+              // Jangan reset transactions jika ingin tetap muncul setelah login ulang
+              currentUser = null;
+              receiptItems = [];
+
+              if (expenseChart) {
+                expenseChart.destroy();
+                expenseChart = null;
+              }
+
+              Swal.fire({
+                icon: "success",
+                title: "Berhasil Logout",
+                text: "Anda berhasil keluar dari sistem",
+                timer: 1500,
+                showConfirmButton: false,
+              }).then(() => {
+                window.location.href = "/";
+              });
+            } else {
+              throw new Error("Logout failed");
+            }
+          }
+        } catch (error) {
+          console.error("Error during logout:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Gagal Logout",
+            text: "Terjadi kesalahan saat logout. Silakan coba lagi.",
+          });
+        }
+      }
     </script>
-</body>
+  </body>
 </html>

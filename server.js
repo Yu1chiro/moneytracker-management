@@ -26,17 +26,18 @@ app.use(express.static('public'));
 // Middleware untuk verifikasi token
 const verifyToken = async (req, res, next) => {
   try {
-    const token = req.cookies.authToken;
-    if (!token) {
-      return res.status(401).json({ error: 'No token provided' });
-    }
-    
-    const decodedToken = await admin.auth().verifyIdToken(token);
-    req.user = decodedToken;
-    next();
-  } catch (error) {
-    return res.status(401).json({ error: 'Invalid token' });
+  const token = req.cookies.authToken;
+  if (!token) {
+    return res.redirect('/');
   }
+
+  const decodedToken = await admin.auth().verifyIdToken(token);
+  req.user = decodedToken;
+  next();
+} catch (error) {
+  return res.redirect('/');
+}
+
 };
 
 // Routes
@@ -211,7 +212,7 @@ app.put('/api/transactions/:id', verifyToken, async (req, res) => {
 app.delete('/api/transactions/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
-
+        const userUid = req.user.uid;
     const transactionRef = db.ref(`users/${userUid}/transactions/${id}`);
     await transactionRef.remove();
 
