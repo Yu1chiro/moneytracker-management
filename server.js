@@ -53,6 +53,10 @@ app.get('/upload', verifyToken, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'upload.html'));
 });
 
+app.get('/icon', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'icon.png'));
+});
+
 // Login endpoint
 app.post('/api/login', async (req, res) => {
   try {
