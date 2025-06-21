@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Struk - Expense Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-xl font-bold text-gray-900">Expense Tracker</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/dashboard" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+                        Dashboard
+                    </a>
+                    <div class="flex items-center space-x-3">
+                        <img id="userPhoto" class="h-8 w-8 rounded-full" src="" alt="User">
+                        <span id="userName" class="text-sm font-medium text-gray-700"></span>
+                    </div>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-900">Upload Struk Belanja</h2>
+            <p class="mt-2 text-gray-600">Scan struk belanja Anda dengan AI untuk otomatis mendeteksi item dan harga</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="px-6 py-8">
+                <!-- Upload Area -->
+                <div id="uploadArea" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+                    <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div class="mb-4">
+                        <label for="receiptFile" class="cursor-pointer">
+                            <span class="text-lg font-medium text-gray-900 hover:text-blue-600">Upload foto struk belanja</span>
+                            <input id="receiptFile" type="file" accept="image/*" class="sr-only" onchange="processReceipt(this)">
+                        </label>
+                        <p class="mt-2 text-sm text-gray-500">Atau drag and drop file disini</p>
+                    </div>
+                    <p class="text-xs text-gray-400">PNG, JPG, JPEG hingga 10MB</p>
+                </div>
+
+                <!-- Preview Area -->
+                <div id="previewArea" class="hidden mt-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Preview Gambar</h3>
+                    <div class="flex justify-center">
+                        <img id="previewImage" class="max-w-full max-h-64 rounded-lg shadow-md" src="" alt="Preview">
+                    </div>
+                </div>
+
+                <!-- Processing Area -->
+                <div id="processingArea" class="hidden mt-6">
+                    <div class="text-center">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <h3 class="text-lg font-medium text-gray-900">Memproses struk dengan AI...</h3>
+                        <p class="text-sm text-gray-500 mt-2">Sedang menganalisis gambar dan mengekstrak data produk</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 class="text-lg font-medium text-blue-900 mb-4">Tips untuk hasil terbaik:</h3>
+            <ul class="space-y-2 text-sm text-blue-800">
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Pastikan struk dalam kondisi terang dan tidak buram
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Foto seluruh bagian struk dari atas hingga bawah
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Hindari bayangan atau pantulan cahaya pada struk
+                </li>
+                <li class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Letakkan struk pada permukaan yang rata
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div id="resultsModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-semibold text-gray-900">Hasil Scan Struk</h3>
+                        <button onclick="hideResultsModal()" class="text-gray-400 hover:text-gray-600">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-4">Periksa dan edit item yang terdeteksi. Anda dapat mengubah nama produk, harga, atau menghapus item yang tidak diperlukan.</p>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="space-y-3 mb-6" id="itemsList">
+                        <!-- Items will be populated here -->
+                    </div>
+
+                    <!-- Add Item Button -->
+                    <button onclick="addNewItem()" class="mb-4 inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Tambah Item
+                    </button>
+
+                    <!-- Total -->
+                    <div class="border-t border-gray-200 pt-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <span class="text-lg font-semibold text-gray-900">Total Belanja:</span>
+                            <span class="text-xl font-bold text-blue-600" id="totalAmount">Rp 0</span>
+                        </div>
+                    </div>
+
+                    <!-- Category Selection -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Kategori untuk semua item:</label>
+                        <select id="itemsCategory" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="Food">Makanan</option>
+                            <option value="Shopping" selected>Belanja</option>
+                            <option value="Health">Kesehatan</option>
+                            <option value="Household">Rumah Tangga</option>
+                            <option value="Personal Care">Perawatan Pribadi</option>
+                            <option value="Other">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-3">
+                        <button onclick="saveAllItems()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Simpan Semua Transaksi
+                        </button>
+                        <button onclick="hideResultsModal()" class="px-6 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let detectedItems = [];
+        let itemCounter = 0;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserProfile();
+            setupDragAndDrop();
+        });
+
+        // Load user profile
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/profile');
+                if (response.ok) {
+                    currentUser = await response.json();
+                    document.getElementById('userName').textContent = currentUser.name;
+                    document.getElementById('userPhoto').src = currentUser.photoURL || '/default-avatar.png';
+                } else {
+                    window.location.href = '/';
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                window.location.href = '/';
+            }
+        }
+
+        // Setup drag and drop
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+        }
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            document.getElementById('uploadArea').classList.add('border-blue-400', 'bg-blue-50');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('uploadArea').classList.remove('border-blue-400', 'bg-blue-50');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                const fileInput = document.getElementById('receiptFile');
+                fileInput.files = files;
+                processReceipt(fileInput);
+            }
+        }
+
+        // Process receipt
+        async function processReceipt(input) {
+            if (!input.files || !input.files[0]) return;
+            
+            const file = input.files[0];
+            
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File tidak valid',
+                    text: 'Silakan pilih file gambar (PNG, JPG, JPEG)'
+                });
+                return;
+            }
+
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File terlalu besar',
+                    text: 'Ukuran file maksimal 10MB'
+                });
+                return;
+            }
+
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                try {
+                    // Show preview
+                    showPreview(e.target.result);
+                    
+                    // Show processing state
+                    showProcessing();
+
+                    // Process with backend
+                    const response = await fetch('/api/process-receipt', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            imageBase64: e.target.result
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    hideProcessing();
+                    
+                    if (response.ok) {
+                        detectedItems = result.items || [];
+                        showResults(result);
+                    } else {
+                        throw new Error(result.error || 'Gagal memproses struk');
+                    }
+                } catch (error) {
+                    console.error('Error processing receipt:', error);
+                    hideProcessing();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal memproses struk',
+                        text: error.message || 'Terjadi kesalahan saat memproses gambar. Silakan coba lagi.'
+                    });
+                }
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        // Show image preview
+        function showPreview(imageSrc) {
+            const previewArea = document.getElementById('previewArea');
+            const previewImage = document.getElementById('previewImage');
+            
+            previewImage.src = imageSrc;
+            previewArea.classList.remove('hidden');
+        }
+
+        // Show processing state
+        function showProcessing() {
+            document.getElementById('processingArea').classList.remove('hidden');
+        }
+
+        // Hide processing state
+        function hideProcessing() {
+            document.getElementById('processingArea').classList.add('hidden');
+        }
+
+        // Show results modal
+        function showResults(result) {
+            populateItemsList();
+            updateTotal();
+            document.getElementById('resultsModal').classList.remove('hidden');
+        }
+
+        // Populate items list
+        function populateItemsList() {
+            const itemsList = document.getElementById('itemsList');
+            itemsList.innerHTML = '';
+            itemCounter = 0;
+
+            detectedItems.forEach((item, index) => {
+                addItemToList(item, index);
+            });
+        }
+
+        // Add item to list
+        function addItemToList(item, index) {
+            const itemsList = document.getElementById('itemsList');
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200';
+            itemDiv.dataset.index = index;
+            
+            itemDiv.innerHTML = `
+                <div class="flex items-center space-x-4">
+                    <div class="flex-1">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Nama Produk</label>
+                        <input type="text" value="${item.name || ''}" 
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                               onchange="updateItem(${index}, 'name', this.value)">
+                    </div>
+                    <div class="w-32">
+                        <label class="block text-xs font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                        <input type="number" value="${item.price || 0}" 
+                               class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
+                               onchange="updateItem(${index}, 'price', parseFloat(this.value) || 0)">
+                    </div>
+                    <div class="flex flex-col space-y-1">
+                        <button onclick="removeItem(${index})" 
+                                class="text-red-600 hover:text-red-800 p-1" title="Hapus item">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            itemsList.appendChild(itemDiv);
+        }
+
+        // Update item
+        function updateItem(index, field, value) {
+            if (detectedItems[index]) {
+                detectedItems[index][field] = value;
+                updateTotal();
+            }
+        }
+
+        // Remove item
+        function removeItem(index) {
+            detectedItems.splice(index, 1);
+            populateItemsList();
+            updateTotal();
+        }
+
+        // Add new item
+        function addNewItem() {
+            const newItem = {
+                name: 'Item baru',
+                price: 0
+            };
+            detectedItems.push(newItem);
+            populateItemsList();
+            updateTotal();
+        }
+
+        // Update total
+        function updateTotal() {
+            const total = detectedItems.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
+            document.getElementById('totalAmount').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+        }
+
+        // Save all items
+        async function saveAllItems() {
+            if (detectedItems.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak ada item',
+                    text: 'Tidak ada item untuk disimpan'
+                });
+                return;
+            }
+
+            const category = document.getElementById('itemsCategory').value;
+
+            try {
+                Swal.fire({
+                    title: 'Menyimpan transaksi...',
+                    html: 'Sedang menyimpan semua item ke database',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                const promises = detectedItems.map(item => 
+                    fetch('/api/transactions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            type: 'expense',
+                            amount: parseFloat(item.price) || 0,
+                            description: item.name || 'Item tidak dikenal',
+                            category: category
+                        })
+                    })
+                );
+
+                const results = await Promise.all(promises);
+                
+                // Check if all requests were successful
+                const failedRequests = results.filter(response => !response.ok);
+                
+                if (failedRequests.length > 0) {
+                    throw new Error(`${failedRequests.length} transaksi gagal disimpan`);
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: `${detectedItems.length} transaksi berhasil disimpan`,
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    hideResultsModal();
+                    resetForm();
+                    // Redirect to dashboard
+                    window.location.href = '/dashboard';
+                });
+
+            } catch (error) {
+                console.error('Error saving items:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal menyimpan',
+                    text: error.message || 'Terjadi kesalahan saat menyimpan transaksi'
+                });
+            }
+        }
+
+        // Hide results modal
+        function hideResultsModal() {
+            document.getElementById('resultsModal').classList.add('hidden');
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('receiptFile').value = '';
+            document.getElementById('previewArea').classList.add('hidden');
+            document.getElementById('processingArea').classList.add('hidden');
+            detectedItems = [];
+            itemCounter = 0;
+        }
+
+        // Logout
+        async function logout() {
+    try {
+        const result = await Swal.fire({
+            title: 'Logout?',
+            text: 'Data transaksi Anda akan tetap tersimpan dan dapat diakses saat login kembali',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Logout',
+            cancelButtonText: 'Batal'
+        });
+
+        if (result.isConfirmed) {
+            Swal.fire({
+                title: 'Logging out...',
+                html: 'Sedang mengeluarkan Anda dari sistem',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            const response = await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                // Jangan reset transactions jika ingin tetap muncul setelah login ulang
+                currentUser = null;
+                receiptItems = [];
+
+                if (expenseChart) {
+                    expenseChart.destroy();
+                    expenseChart = null;
+                }
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Logout',
+                    text: 'Anda berhasil keluar dari sistem',
+                    timer: 1500,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/';
+                });
+            } else {
+                throw new Error('Logout failed');
+            }
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal Logout',
+            text: 'Terjadi kesalahan saat logout. Silakan coba lagi.'
+        });
+    }
+}
+
+    </script>
+</body>
+</html>
