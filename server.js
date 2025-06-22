@@ -245,7 +245,7 @@ app.post('/api/process-receipt', verifyToken, async (req, res) => {
       {
         contents: [{
           parts: [{
-            text: "Analisis struk belanja ini dan ekstrak informasi produk dengan harga dalam format JSON. Berikan response dalam format: {\"items\": [{\"name\": \"nama produk\", \"price\": angka_harga}], \"total\": total_harga}. Hanya berikan JSON tanpa penjelasan tambahan."
+            "text": "Analisis isi struk belanja berikut ini dan ekstrak semua informasi produk dengan harga satuan dalam format JSON. Fokus hanya pada nama produk dan harganya yang dibeli, bukan pajak atau diskon. Identifikasi dan gunakan total harga akhir yang sudah termasuk pajak jika tersedia. Jika tidak ada total akhir, gunakan subtotal. Kembalikan hanya dalam format: {\"items\": [{\"name\": \"nama produk\", \"price\": angka_harga}], \"total\": total_harga}.. Jangan sertakan penjelasan tambahan atau teks di luar format JSON tersebut."
           }, {
             inline_data: {
               mime_type: "image/jpeg",

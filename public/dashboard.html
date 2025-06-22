@@ -1046,19 +1046,19 @@ container.appendChild(div);
         try {
           const result = await Swal.fire({
             title: "Logout?",
-            text: "Data transaksi Anda akan tetap tersimpan dan dapat diakses saat login kembali",
+            text: "Apakah anda sudh selesai mencatat semua pengeluaran/pemasukan?",
             icon: "question",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Ya, Logout",
+            confirmButtonText: "Logout",
             cancelButtonText: "Batal",
           });
 
           if (result.isConfirmed) {
             Swal.fire({
               title: "Logging out...",
-              html: "Sedang mengeluarkan Anda dari sistem",
+              html: "please waiting....",
               allowOutsideClick: false,
               didOpen: () => {
                 Swal.showLoading();
@@ -1084,8 +1084,8 @@ container.appendChild(div);
 
               Swal.fire({
                 icon: "success",
-                title: "Berhasil Logout",
-                text: "Anda berhasil keluar dari sistem",
+                title: "Berhasil!",
+                text: "Jangan lupa signin jika ingin mencatat pengeluaran/pemasukan ya!",
                 timer: 1500,
                 showConfirmButton: false,
               }).then(() => {
