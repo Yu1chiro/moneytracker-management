@@ -9,7 +9,17 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  </head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <style>
+        /* Optional: Smooth hover transition */
+        #nav-item {
+            transition: all 0.2s ease;
+        }
+        #nav-item:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+    </head>
   <body class="bg-gray-50">
     <!-- Navigation -->
     <nav class="bg-white shadow-sm border-b">
@@ -21,12 +31,35 @@
             </div>
           </div>
           <div class="flex items-center space-x-4">
+             <a href="/dashboard" class="hidden lg:block nav-item flex flex-col items-center py-3 px-4 text-gray-600 hover:text-blue-600">
+                <span class="text-lg font-semibold mt-1">Dashboard </span>
+            </a>
+            
+            <!-- AI Chat Assistant Link -->
+            <a href="/assistant" class="hidden lg:block nav-item flex flex-col items-center py-3 px-4 text-gray-600 hover:text-blue-600">
+                <span class="text-lg font-semibold mt-1">Assitant AI</span>
+            </a>
             <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium">Logout</button>
           </div>
         </div>
       </div>
     </nav>
-
+    <!-- Navbar Bottom Mobile Only -->
+    <div id="nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 z-50">
+        <div class="flex justify-around">
+            <!-- Home/Dashboard Link -->
+            <a href="/dashboard" class="nav-item flex flex-col items-center py-3 px-4 text-gray-600 hover:text-blue-600">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            
+            <!-- AI Chat Assistant Link -->
+            <a href="/assistant" class="nav-item flex flex-col items-center py-3 px-4 text-gray-600 hover:text-blue-600">
+                <i class="fas fa-comment-dots text-xl"></i>
+                <span class="text-xs mt-1">Assistant AI</span>
+            </a>
+        </div>
+    </div>
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       <!-- Stats Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -90,7 +123,7 @@
               </div>
               <div class="ml-5 w-0 flex-1">
                 <dl>
-                  <dt class="text-sm font-medium text-gray-500 truncate">Saldo</dt>
+                  <dt class="text-sm font-medium text-gray-500 truncate">Saldo Saat Ini</dt>
                   <dd class="text-lg font-medium" id="balance">Rp 0</dd>
                 </dl>
               </div>
@@ -264,7 +297,7 @@
         <div class="lg:col-span-1">
           <div class="bg-white shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Statistik Pengeluaran</h3>
+              <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Statistik</h3>
               <div class="relative h-64">
                 <canvas id="expenseChart"></canvas>
               </div>
