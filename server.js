@@ -297,7 +297,7 @@ app.post('/api/process-receipt', verifyToken, async (req, res) => {
 // Get dashboard statistics
 app.get('/api/stats', verifyToken, async (req, res) => {
   try {
-        const userUid = req.user.uid;
+    const userUid = req.user.uid;
     const transactionsRef = db.ref(`users/${userUid}/transactions`);
     const snapshot = await transactionsRef.once('value');
     const transactions = snapshot.val() || {};
@@ -306,23 +306,67 @@ app.get('/api/stats', verifyToken, async (req, res) => {
     let totalExpense = 0;
     const categoryExpenses = {};
     
+    // Debugging: Log semua transaksi
+    console.log('Raw transactions data:', transactions);
+    
     Object.values(transactions).forEach(transaction => {
-      if (transaction.type === 'income') {
-        totalIncome += transaction.amount;
-      } else if (transaction.type === 'expense') {
-        totalExpense += transaction.amount;
+      // PERBAIKAN 1: Validasi dan konversi data
+      if (!transaction || typeof transaction !== 'object') {
+        console.warn('Invalid transaction object:', transaction);
+        return;
+      }
+      
+      // PERBAIKAN 2: Pastikan amount adalah number
+      let amount = transaction.amount;
+      if (typeof amount === 'string') {
+        amount = parseFloat(amount);
+      }
+      if (isNaN(amount) || amount === null || amount === undefined) {
+        console.warn('Invalid amount in transaction:', transaction);
+        return;
+      }
+      
+      // PERBAIKAN 3: Validasi type
+      const type = transaction.type;
+      if (!type || (type !== 'income' && type !== 'expense')) {
+        console.warn('Invalid transaction type:', transaction);
+        return;
+      }
+      
+      // PERBAIKAN 4: Kalkulasi dengan number yang sudah divalidasi
+      if (type === 'income') {
+        // Income selalu positif
+        const incomeAmount = Math.abs(amount);
+        totalIncome += incomeAmount;
+        console.log(`Income added: ${incomeAmount}, Total income now: ${totalIncome}`);
+      } else if (type === 'expense') {
+        // Expense selalu dihitung sebagai nilai positif untuk total
+        const expenseAmount = Math.abs(amount);
+        totalExpense += expenseAmount;
+        console.log(`Expense added: ${expenseAmount}, Total expense now: ${totalExpense}`);
+        
         const category = transaction.category || 'Other';
-        categoryExpenses[category] = (categoryExpenses[category] || 0) + transaction.amount;
+        categoryExpenses[category] = (categoryExpenses[category] || 0) + expenseAmount;
       }
     });
     
-    const balance = totalIncome - totalExpense;
+    // PERBAIKAN 5: Pastikan hasil akhir adalah number dan round ke 2 desimal
+    totalIncome = Math.round(totalIncome * 100) / 100;
+    totalExpense = Math.round(totalExpense * 100) / 100;
+    const balance = Math.round((totalIncome - totalExpense) * 100) / 100;
+    
     
     res.json({
       totalIncome,
       totalExpense,
       balance,
-      categoryExpenses
+      categoryExpenses,
+      // Tambahan untuk debugging
+      debug: {
+        transactionCount: Object.keys(transactions).length,
+        incomeTransactions: Object.values(transactions).filter(t => t.type === 'income').length,
+        expenseTransactions: Object.values(transactions).filter(t => t.type === 'expense').length
+      }
     });
   } catch (error) {
     console.error('Stats error:', error);
@@ -330,7 +374,68 @@ app.get('/api/stats', verifyToken, async (req, res) => {
   }
 });
 
+// PERBAIKAN TAMBAHAN: Endpoint untuk membersihkan/validasi data
+app.post('/api/fix-transactions', verifyToken, async (req, res) => {
+  try {
+    const userUid = req.user.uid;
+    const transactionsRef = db.ref(`users/${userUid}/transactions`);
+    const snapshot = await transactionsRef.once('value');
+    const transactions = snapshot.val() || {};
+    
+    let fixedCount = 0;
+    const updates = {};
+    
+    Object.entries(transactions).forEach(([key, transaction]) => {
+      let needsUpdate = false;
+      const fixedTransaction = { ...transaction };
+      
+      // Fix amount
+      if (typeof transaction.amount === 'string') {
+        fixedTransaction.amount = parseFloat(transaction.amount);
+        needsUpdate = true;
+      }
+      
+      // Fix invalid amounts
+      if (isNaN(fixedTransaction.amount)) {
+        fixedTransaction.amount = 0;
+        needsUpdate = true;
+      }
+      
+      // Fix missing category
+      if (!fixedTransaction.category) {
+        fixedTransaction.category = 'Other';
+        needsUpdate = true;
+      }
+      
+      // Fix invalid type
+      if (fixedTransaction.type !== 'income' && fixedTransaction.type !== 'expense') {
+        fixedTransaction.type = 'expense'; // default
+        needsUpdate = true;
+      }
+      
+      if (needsUpdate) {
+        updates[key] = fixedTransaction;
+        fixedCount++;
+      }
+    });
+    
+    if (fixedCount > 0) {
+      await transactionsRef.update(updates);
+    }
+    
+    res.json({
+      success: true,
+      message: `${fixedCount} transactions fixed`,
+      fixedCount
+    });
+  } catch (error) {
+    console.error('Fix transactions error:', error);
+    res.status(500).json({ error: 'Failed to fix transactions' });
+  }
+});
+
 // Chat dengan Gemini endpoint
+// Chat dengan Gemini endpoint - DIPERBAIKI
 app.post('/api/chat', verifyToken, async (req, res) => {
   try {
     const { message } = req.body;
@@ -347,18 +452,32 @@ app.post('/api/chat', verifyToken, async (req, res) => {
     const recentTransactions = [];
     
     Object.entries(transactions).forEach(([key, transaction]) => {
-      if (transaction.type === 'income') {
-        totalIncome += transaction.amount;
-      } else if (transaction.type === 'expense') {
-        totalExpense += transaction.amount;
-        const category = transaction.category || 'Other';
-        categoryExpenses[category] = (categoryExpenses[category] || 0) + transaction.amount;
+      // PERBAIKAN: Validasi dan konversi amount
+      let amount = transaction.amount;
+      if (typeof amount === 'string') {
+        amount = parseFloat(amount);
+      }
+      if (isNaN(amount)) {
+        return; // Skip invalid transactions
       }
       
-      // Ambil 5 transaksi terakhir
+      if (transaction.type === 'income') {
+        // Income selalu positif
+        const incomeAmount = Math.abs(amount);
+        totalIncome += incomeAmount;
+      } else if (transaction.type === 'expense') {
+        // Expense selalu dihitung sebagai nilai positif
+        const expenseAmount = Math.abs(amount);
+        totalExpense += expenseAmount;
+        
+        const category = transaction.category || 'Other';
+        categoryExpenses[category] = (categoryExpenses[category] || 0) + expenseAmount;
+      }
+      
+      // Ambil transaksi untuk recent transactions
       recentTransactions.push({
         description: transaction.description,
-        amount: transaction.amount,
+        amount: Math.abs(amount), // Selalu tampilkan sebagai positif
         type: transaction.type,
         category: transaction.category,
         date: transaction.createdAt
@@ -368,7 +487,8 @@ app.post('/api/chat', verifyToken, async (req, res) => {
     recentTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
     const last5Transactions = recentTransactions.slice(0, 5);
     
-    const balance = totalIncome - totalExpense;
+    // PERBAIKAN: Kalkulasi balance yang benar
+    const balance = Math.round((totalIncome - totalExpense) * 100) / 100;
     
     // Context untuk Gemini
     const financialContext = `
